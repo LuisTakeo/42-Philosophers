@@ -1,8 +1,9 @@
 CC = gcc
+#-fsanitize=thread
 FLAGS = -Wall -Werror -Wextra -pthread -fsanitize=thread
 
 NAME = philo
-SRC = ${addsuffix .c, main utils}
+SRC = ${addsuffix .c, main utils utils2}
 OBJS = ${SRC:%.c=%.o}
 
 

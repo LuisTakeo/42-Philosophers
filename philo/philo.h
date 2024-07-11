@@ -23,6 +23,8 @@
 
 typedef struct s_philo	t_philo;
 typedef struct s_table	t_table;
+typedef struct timeval	t_timeval;
+
 
 struct s_philo
 {
@@ -35,13 +37,14 @@ struct s_philo
 
 struct s_table
 {
-	pthread_t	philos[200];
-	pthread_t	monitor;
-	long		time_to_die;
-	long		time_to_eat;
-	long		time_to_sleep;
-	int			max_eating;
-	int			number_of_philos;
+	pthread_t		ph_th[200];
+	pthread_t		monitor;
+	pthread_mutex_t	ph_mutex[200];
+	long			t_to_die;
+	long			t_to_eat;
+	long			t_to_sleep;
+	int				max_eat;
+	int				num_of_philos;
 };
 
 int		ft_issignal(char c);
@@ -50,5 +53,6 @@ int		ft_strlen(char *str);
 int		ft_isdigit(int c);
 int		is_int(char *arg);
 long	ft_atol(const char *nptr);
+long	get_time(void);
 
 #endif

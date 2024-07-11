@@ -12,22 +12,46 @@
 
 #include "philo.h"
 
-int		eating(t_philo *philo)
+int		take_forks(t_philo *philo)
 {
+	int	result;
+
 	if (philo->id_philo % 2)
 	{
-		pthread_mutex_lock(philo->left_fork);
-		pthread_mutex_lock(philo->right_fork);
+		result = (pthread_mutex_lock(philo->left_fork)
+				&& pthread_mutex_lock(philo->right_fork));
 	}
 	else
 	{
-		pthread_mutex_lock(philo->right_fork);
-		pthread_mutex_lock(philo->left_fork);
+		result = (pthread_mutex_lock(philo->right_fork)
+				&& pthread_mutex_lock(philo->left_fork));
 	}
+	return (result);
+}
+
+int	release_forks(t_philo *philo)
+{
+	int	result;
+
+	if (philo->id_philo % 2)
+	{
+		result = (pthread_mutex_unlock(philo->left_fork)
+				&& pthread_mutex_unlock(philo->right_fork));
+	}
+	else
+	{
+		result = (pthread_mutex_unlock(philo->right_fork)
+				&& pthread_mutex_unlock(philo->left_fork));
+	}
+	return (result);
+}
+
+int		eating(t_philo *philo)
+{
+	take_forks(philo);
 	printf("Philo %d está comendo\n", philo->id_philo);
-	usleep(1000000);
-	pthread_mutex_unlock(philo->left_fork);
-	pthread_mutex_unlock(philo->right_fork);
+	usleep(200 * 1000);
+	release_forks(philo);
 	return (EXIT_SUCCESS);
 }
 
@@ -68,13 +92,34 @@ int	is_invalid_param(char **argv)
 	return (EXIT_SUCCESS);
 }
 
+
+
+// Validação de argumentos -> DONE!
+// Criar função para setar garfos aos filosofos
+// Criar função de inicializar os threads
+// Criar função de inizialiar os mutexes
+// Criar função de inicializar valores
+// Criar função de conversão de milisegundos para microsegundos
+//
+
+int	init_table(t_table *table, int argc, char **argv)
+{
+	table->num_of_philos = ft_atol(argv[1]);
+	// table->t_to_die;
+	// table->t_to_eat;
+	// table->t_to_sleep;
+	// table->max_eat;
+	(void)argc;
+	return (0);
+}
+
 int	main(int argc, char **argv)
 {
-	t_table		table;
-	pthread_t		philos_threads[2];
+	t_table			table;
 	t_philo			philos[2];
 	pthread_mutex_t	mut_t1;
 	pthread_mutex_t	mut_t2;
+	long			initial_time;
 
 	if (argc < 5 || argc > 6)
 		return(ft_print_error("Invalid amount of parameters. \nUse this command: \n"
@@ -84,10 +129,12 @@ int	main(int argc, char **argv)
 		return (EXIT_FAILURE);
 	(void)argv;
 	(void)table;
+	initial_time = get_time();
+	printf("Initial time: %ld\n", initial_time - initial_time);
 	philos[0].id_philo = 0;
 	philos[1].id_philo = 1;
-	philos[0].philo = &philos_threads[0];
-	philos[1].philo = &philos_threads[1];
+	philos[0].philo = &table.ph_th[0];
+	philos[1].philo = &table.ph_th[1];
 	pthread_mutex_init(&mut_t1, NULL);
 	pthread_mutex_init(&mut_t2, NULL);
 	philos[0].left_fork = &mut_t1;
@@ -97,9 +144,9 @@ int	main(int argc, char **argv)
 	pthread_create(philos[0].philo, NULL, &routine, &(philos[0]));
 	pthread_create(philos[1].philo, NULL, &routine, &(philos[1]));
 	pthread_join(*philos[0].philo, NULL);
-	usleep(200);
 	pthread_join(*philos[1].philo, NULL);
 	pthread_mutex_destroy(&mut_t1);
 	pthread_mutex_destroy(&mut_t2);
+	printf("Initial time: %ld\n", get_time() - initial_time);
 	return (EXIT_SUCCESS);
 }
