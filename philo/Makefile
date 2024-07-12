@@ -3,8 +3,8 @@ CC = gcc
 FLAGS = -Wall -Werror -Wextra -pthread -fsanitize=thread
 
 NAME = philo
-SRC = ${addsuffix .c, main utils utils2}
-OBJS = ${SRC:%.c=%.o}
+SRC = ${addsuffix .c, main utils utils2 init actions}
+OBJS = ${SRC:%.c=bin/%.o}
 
 
 all: initial_msg $(NAME)
@@ -16,7 +16,7 @@ initial_msg:
 $(NAME): $(OBJS)
 	@$(CC) $(FLAGS) $(OBJS) -o $(NAME) && echo "Compilando: $@"
 
-%.o:%.c
+bin/%.o:%.c
 	@$(CC) $(FLAGS) -o $@ -c $< && echo "Compilando: $(notdir $<)"
 
 clean:

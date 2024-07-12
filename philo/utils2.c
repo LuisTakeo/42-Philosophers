@@ -46,3 +46,10 @@ long	get_time(void)
 	gettimeofday(&tv, NULL);
 	return (((tv.tv_sec * 1000) + (tv.tv_usec / 1000)));
 }
+
+int	ft_print_error(char *error)
+{
+	write(STDERR_FILENO, error, ft_strlen(error));
+	write(STDERR_FILENO, "\n", 1);
+	return (EXIT_FAILURE);
+}
