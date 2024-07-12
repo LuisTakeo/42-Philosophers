@@ -35,8 +35,6 @@ void	*routine(void *arg)
 		thinking(&philo);
 		i++;
 	}
-	// sleeping
-	// thinking
 	return (NULL);
 }
 
@@ -84,6 +82,27 @@ int	finish_dinner(t_table *table)
 	return (0);
 }
 
+int	create_philos(t_table *table)
+{
+	int	i;
+
+	i = 0;
+	while (i < table->num_of_philos)
+	{
+		pthread_create(table->philos[i].philo, NULL,
+			&routine, &(table->philos[i]));
+		i++;
+	}
+	// pthread_create(&table->monitor, NULL,);
+	i = 0;
+	while (i < table->num_of_philos)
+	{
+		pthread_join(*(table->philos[i].philo), NULL);
+		i++;
+	}
+	return (0);
+}
+
 int	main(int argc, char **argv)
 {
 	t_table			table;
@@ -96,11 +115,8 @@ int	main(int argc, char **argv)
 	if (is_invalid_param(argv) || init_table(&table, argc, argv))
 		return (EXIT_FAILURE);
 	printf("Initial time: %ld\n", table.init_time - table.init_time);
-	pthread_create(table.philos[0].philo, NULL, &routine, &(table.philos[0]));
-	pthread_create(table.philos[1].philo, NULL, &routine, &(table.philos[1]));
-	pthread_join(*(table.philos[0].philo), NULL);
-	pthread_join(*(table.philos[1].philo), NULL);
-	printf("Finish time: %ld\n", get_time() - table.init_time);
+	create_philos(&table);
 	finish_dinner(&table);
+	// printf("Finish time: %ld\n", get_time() - table.init_time);
 	return (EXIT_SUCCESS);
 }
