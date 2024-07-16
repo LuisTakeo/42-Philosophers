@@ -21,6 +21,28 @@ int	print_action(t_philo *philo, char *msg)
 	return (0);
 }
 
+void	*single_routine(void *arg)
+{
+	t_philo	philo;
+
+	philo = *(t_philo *)arg;
+	pthread_mutex_lock(philo.left_fork);
+	print_action(&philo, "%d %d has taken a fork\n");
+	usleep(philo.table->t_to_die * 1000);
+	pthread_mutex_unlock(philo.left_fork);
+	print_action(&philo, "%d %d is dead\n");
+	return (NULL);
+}
+
+int	is_someone_dead(t_philo *philo)
+{
+	// mutex USAR
+	if (philo->table->is_dead)
+		return (1);
+	return (0);
+}
+
+
 void	*routine(void *arg)
 {
 	t_philo	philo;
@@ -28,7 +50,7 @@ void	*routine(void *arg)
 
 	philo = *(t_philo *)arg;
 	i = 0;
-	while (i < 10)
+	while (i < 10 && !is_someone_dead(&philo))
 	{
 		eating(&philo);
 		sleeping(&philo);
@@ -87,13 +109,19 @@ int	create_philos(t_table *table)
 	int	i;
 
 	i = 0;
-	while (i < table->num_of_philos)
-	{
+	if (table->num_of_philos == 1)
 		pthread_create(table->philos[i].philo, NULL,
-			&routine, &(table->philos[i]));
-		i++;
-	}
+				&single_routine, &(table->philos[i]));
+	else
+	{
+		while (i < table->num_of_philos)
+		{
+			pthread_create(table->philos[i].philo, NULL,
+				&routine, &(table->philos[i]));
+			i++;
+		}
 	// pthread_create(&table->monitor, NULL,);
+	}
 	i = 0;
 	while (i < table->num_of_philos)
 	{
@@ -114,7 +142,7 @@ int	main(int argc, char **argv)
 				"time_to_sleep [number_of_times_each_philosopher_must_eat]"));
 	if (is_invalid_param(argv) || init_table(&table, argc, argv))
 		return (EXIT_FAILURE);
-	printf("Initial time: %ld\n", table.init_time - table.init_time);
+	// printf("Initial time: %ld\n", table.init_time - table.init_time);
 	create_philos(&table);
 	finish_dinner(&table);
 	// printf("Finish time: %ld\n", get_time() - table.init_time);

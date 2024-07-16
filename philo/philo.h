@@ -50,6 +50,7 @@ struct s_table
 	long			t_to_sleep;
 	int				max_eat;
 	int				num_of_philos;
+	int				is_dead;
 };
 
 // Validators

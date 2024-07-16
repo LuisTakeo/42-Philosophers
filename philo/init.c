@@ -19,8 +19,10 @@ int	init_table(t_table *table, int argc, char **argv)
 	table->t_to_eat = ft_atol(argv[3]);
 	table->t_to_sleep = ft_atol(argv[4]);
 	table->max_eat = -1;
+	table->is_dead = 0;
 	if (argc == 6)
 		table->max_eat = ft_atol(argv[5]);
+
 	if (table->num_of_philos > 200)
 		return (ft_print_error("Invalid number of "
 				"philosophers. Min value: 1, Max value: 200\n"));
