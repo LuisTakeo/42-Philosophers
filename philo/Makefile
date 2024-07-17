@@ -1,6 +1,6 @@
 CC = gcc
 #-fsanitize=thread
-FLAGS = -Wall -Werror -Wextra -pthread
+FLAGS = -Wall -Werror -Wextra -pthread -fsanitize=thread
 
 NAME = philo
 SRC = ${addsuffix .c, main utils utils2 init actions monitor}

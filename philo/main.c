@@ -74,15 +74,6 @@ int	is_invalid_param(char **argv)
 	return (EXIT_SUCCESS);
 }
 
-// Validação de argumentos -> DONE!
-// Criar função para setar garfos aos filosofos -> DONE
-// Criar função de inicializar os threads
-// Criar função de inizialiar os mutexes -> DONE
-// Criar função de inicializar valores -> DONE
-// Criar função de conversão de milisegundos para microsegundos -> DONE
-// Criar mutexes para manipulação de variáveis compartilhadas
-// Criar função que capturará quando um philo morreu
-
 int	finish_dinner(t_table *table)
 {
 	int	i;
@@ -103,6 +94,21 @@ int	finish_dinner(t_table *table)
 	return (0);
 }
 
+int	join_philos(t_table *table)
+{
+	int	i;
+
+	i = 0;
+	while (i < table->num_of_philos)
+	{
+		pthread_join(*(table->philos[i].philo), NULL);
+		i++;
+	}
+	if (table->num_of_philos > 1)
+		pthread_join(table->monitor, NULL);
+	return (0);
+}
+
 int	create_philos(t_table *table)
 {
 	int	i;
@@ -119,15 +125,9 @@ int	create_philos(t_table *table)
 				&routine, &(table->philos[i]));
 			i++;
 		}
-	pthread_create(&(table->monitor), NULL, &monitoring, table);
+		pthread_create(&(table->monitor), NULL, &monitoring, table);
 	}
-	i = 0;
-	while (i < table->num_of_philos)
-	{
-		pthread_join(*(table->philos[i].philo), NULL);
-		i++;
-	}
-	pthread_join(table->monitor, NULL);
+	join_philos(table);
 	return (0);
 }
 
@@ -142,7 +142,8 @@ int	main(int argc, char **argv)
 				"time_to_sleep [number_of_times_each_philosopher_must_eat]"));
 	if (is_invalid_param(argv) || init_table(&table, argc, argv))
 		return (EXIT_FAILURE);
-	// printf("Initial time: %ld\n", table.init_time - table.init_time);
+	if (table.max_eat == 0)
+		return (EXIT_SUCCESS);
 	create_philos(&table);
 	finish_dinner(&table);
 	// printf("Finish time: %ld\n", get_time() - table.init_time);

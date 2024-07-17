@@ -47,7 +47,7 @@ int	release_forks(t_philo *philo)
 	return (0);
 }
 
-int		eating(t_philo *philo)
+int	eating(t_philo *philo)
 {
 	take_forks(philo);
 	pthread_mutex_lock(&philo->table->ph_lst_meal);
@@ -59,14 +59,14 @@ int		eating(t_philo *philo)
 	return (EXIT_SUCCESS);
 }
 
-int		sleeping(t_philo *philo)
+int	sleeping(t_philo *philo)
 {
 	print_action(philo, "%d %d is sleeping\n", 1);
 	usleep(philo->table->t_to_sleep * 1000);
 	return (EXIT_SUCCESS);
 }
 
-int		thinking(t_philo *philo)
+int	thinking(t_philo *philo)
 {
 	print_action(philo, "%d %d is thinking\n", 1);
 	return (EXIT_SUCCESS);

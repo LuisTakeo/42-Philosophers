@@ -22,10 +22,11 @@ int	init_table(t_table *table, int argc, char **argv)
 	table->is_dead = 0;
 	if (argc == 6)
 		table->max_eat = ft_atol(argv[5]);
-
-	if (table->num_of_philos > 200)
+	if (table->max_eat == 0)
+		return (0);
+	if (table->num_of_philos > 200 || table->num_of_philos < 1)
 		return (ft_print_error("Invalid number of "
-				"philosophers. Min value: 1, Max value: 200\n"));
+				"philosophers. Min value: 1, Max value: 200"));
 	if (init_struct_philos(table))
 		return (1);
 	return (0);

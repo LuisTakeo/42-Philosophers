@@ -35,7 +35,6 @@ int	verify_death(t_table *table)
 	{
 		pthread_mutex_lock(&table->ph_lst_meal);
 		last = table->philos[i].last_meal;
-
 		if ((get_time() - table->philos[i].last_meal) >= table->t_to_die)
 		{
 			pthread_mutex_lock(&table->ph_is_dead);
@@ -58,6 +57,6 @@ void	*monitoring(void *arg)
 
 	table = (t_table *)arg;
 	while (!verify_death(table))
-		usleep(50);
+		;
 	return (NULL);
 }

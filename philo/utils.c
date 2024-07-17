@@ -71,4 +71,3 @@ int	is_int(char *arg)
 		return (1);
 	return (0);
 }
-

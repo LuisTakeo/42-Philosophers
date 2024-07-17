@@ -25,7 +25,6 @@ typedef struct s_philo	t_philo;
 typedef struct s_table	t_table;
 typedef struct timeval	t_timeval;
 
-
 struct s_philo
 {
 	pthread_t		*philo;
@@ -43,7 +42,7 @@ struct s_table
 	pthread_t		monitor;
 	pthread_mutex_t	ph_mutex[200];
 	pthread_mutex_t	ph_print;
-	pthread_mutex_t	ph_is_dead; // MUTEX IS DEAD
+	pthread_mutex_t	ph_is_dead;
 	pthread_mutex_t	ph_lst_meal;
 	t_philo			*philos;
 	long			init_time;
@@ -61,6 +60,8 @@ int		is_invalid_param(char **argv);
 int		init_table(t_table *table, int argc, char **argv);
 int		init_struct_philos(t_table *table);
 int		init_mutexes(t_table *table);
+int		join_philos(t_table *table);
+int		is_created(t_table *table);
 // Finishers
 int		finish_dinner(t_table *table);
 // Actions
