@@ -1,9 +1,9 @@
 CC = gcc
 #-fsanitize=thread
-FLAGS = -Wall -Werror -Wextra -pthread -fsanitize=thread
+FLAGS = -Wall -Werror -Wextra -pthread
 
 NAME = philo
-SRC = ${addsuffix .c, main utils utils2 init actions}
+SRC = ${addsuffix .c, main utils utils2 init actions monitor}
 OBJS = ${SRC:%.c=bin/%.o}
 
 

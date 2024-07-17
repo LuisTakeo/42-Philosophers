@@ -28,7 +28,6 @@ int	init_table(t_table *table, int argc, char **argv)
 				"philosophers. Min value: 1, Max value: 200\n"));
 	if (init_struct_philos(table))
 		return (1);
-	table->init_time = get_time();
 	return (0);
 }
 
@@ -41,6 +40,7 @@ int	init_struct_philos(t_table *table)
 		return (1);
 	i = 0;
 	init_mutexes(table);
+	table->init_time = get_time();
 	while (i < table->num_of_philos)
 	{
 		table->philos[i].philo = &table->ph_th[i];
@@ -69,5 +69,7 @@ int	init_mutexes(t_table *table)
 		i++;
 	}
 	pthread_mutex_init(&table->ph_print, NULL);
+	pthread_mutex_init(&table->ph_is_dead, NULL);
+	pthread_mutex_init(&table->ph_lst_meal, NULL);
 	return (0);
 }

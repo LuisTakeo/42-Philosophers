@@ -43,6 +43,8 @@ struct s_table
 	pthread_t		monitor;
 	pthread_mutex_t	ph_mutex[200];
 	pthread_mutex_t	ph_print;
+	pthread_mutex_t	ph_is_dead; // MUTEX IS DEAD
+	pthread_mutex_t	ph_lst_meal;
 	t_philo			*philos;
 	long			init_time;
 	long			t_to_die;
@@ -76,7 +78,11 @@ int		is_int(char *arg);
 long	ft_atol(const char *nptr);
 long	get_time(void);
 // Prints
-int		print_action(t_philo *philo, char *msg);
+int		print_action(t_philo *philo, char *msg, int is_philo);
 int		ft_print_error(char *error);
+// Monitoring
+void	*monitoring(void *arg);
+int		is_someone_dead(t_table *table);
+int		verify_death(t_table *table);
 
 #endif

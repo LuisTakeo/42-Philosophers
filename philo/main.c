@@ -12,8 +12,10 @@
 
 #include "philo.h"
 
-int	print_action(t_philo *philo, char *msg)
+int	print_action(t_philo *philo, char *msg, int is_philo)
 {
+	if (is_someone_dead(philo->table) && is_philo)
+		return (1);
 	pthread_mutex_lock(&philo->table->ph_print);
 	printf(msg, (int)(get_time() - philo->table->init_time),
 		philo->id_philo + 1);
@@ -27,34 +29,25 @@ void	*single_routine(void *arg)
 
 	philo = *(t_philo *)arg;
 	pthread_mutex_lock(philo.left_fork);
-	print_action(&philo, "%d %d has taken a fork\n");
+	print_action(&philo, "%d %d has taken a fork\n", 1);
 	usleep(philo.table->t_to_die * 1000);
 	pthread_mutex_unlock(philo.left_fork);
-	print_action(&philo, "%d %d is dead\n");
+	print_action(&philo, "%d %d is dead\n", 1);
 	return (NULL);
 }
 
-int	is_someone_dead(t_philo *philo)
-{
-	// mutex USAR
-	if (philo->table->is_dead)
-		return (1);
-	return (0);
-}
-
-
 void	*routine(void *arg)
 {
-	t_philo	philo;
+	t_philo	*philo;
 	int		i;
 
-	philo = *(t_philo *)arg;
+	philo = (t_philo *)arg;
 	i = 0;
-	while (i < 10 && !is_someone_dead(&philo))
+	while (!is_someone_dead(philo->table))
 	{
-		eating(&philo);
-		sleeping(&philo);
-		thinking(&philo);
+		eating(philo);
+		sleeping(philo);
+		thinking(philo);
 		i++;
 	}
 	return (NULL);
@@ -98,9 +91,15 @@ int	finish_dinner(t_table *table)
 	while (i < table->num_of_philos)
 	{
 		pthread_mutex_destroy(&table->ph_mutex[i++]);
-		free(table->philos);
+		if (table->philos)
+		{
+			free(table->philos);
+			table->philos = NULL;
+		}
 	}
 	pthread_mutex_destroy(&table->ph_print);
+	pthread_mutex_destroy(&table->ph_is_dead);
+	pthread_mutex_destroy(&table->ph_lst_meal);
 	return (0);
 }
 
@@ -111,7 +110,7 @@ int	create_philos(t_table *table)
 	i = 0;
 	if (table->num_of_philos == 1)
 		pthread_create(table->philos[i].philo, NULL,
-				&single_routine, &(table->philos[i]));
+			&single_routine, &(table->philos[i]));
 	else
 	{
 		while (i < table->num_of_philos)
@@ -120,7 +119,7 @@ int	create_philos(t_table *table)
 				&routine, &(table->philos[i]));
 			i++;
 		}
-	// pthread_create(&table->monitor, NULL,);
+	pthread_create(&(table->monitor), NULL, &monitoring, table);
 	}
 	i = 0;
 	while (i < table->num_of_philos)
@@ -128,6 +127,7 @@ int	create_philos(t_table *table)
 		pthread_join(*(table->philos[i].philo), NULL);
 		i++;
 	}
+	pthread_join(table->monitor, NULL);
 	return (0);
 }
 
