@@ -38,29 +38,29 @@ struct s_philo
 
 struct s_table
 {
-	pthread_t		ph_th[200];
-	pthread_t		mon;
-	pthread_mutex_t	*ph_mut;
-	pthread_mutex_t	ph_print;
-	pthread_mutex_t	ph_is_d;
-	pthread_mutex_t	ph_lst_ml;
-	pthread_mutex_t	ph_is_full;
-	pthread_mutex_t	ph_end_din;
-	pthread_mutex_t	ph_init;
-	pthread_mutex_t	ph_num_phs;
-	pthread_mutex_t	ph_num_phs_init;
-	t_philo			*philos;
-	size_t			init_time;
-	size_t			t_to_die;
-	size_t			t_to_eat;
-	size_t			t_to_sleep;
-	short int		max_eat;
-	short int		num_phs_init;
-	short int		num_phs;
-	short int		is_dead;
-	short int		is_created;
-	short int		end_din;
-	short int		num_full;
+	pthread_t			ph_th[200];
+	pthread_t			mon;
+	pthread_mutex_t		*ph_mut;
+	pthread_mutex_t		ph_print;
+	pthread_mutex_t		ph_is_d;
+	pthread_mutex_t		ph_lst_ml;
+	pthread_mutex_t		ph_is_full;
+	pthread_mutex_t		ph_end_din;
+	pthread_mutex_t		ph_init;
+	pthread_mutex_t		ph_num_phs;
+	pthread_mutex_t		ph_num_phs_init;
+	t_philo				*philos;
+	size_t				init_time;
+	size_t				t_to_die;
+	size_t				t_to_eat;
+	size_t				t_to_sleep;
+	short int			max_eat;
+	short int			num_phs_init;
+	short int			num_phs;
+	short int			is_dead;
+	short int			is_created;
+	short int			end_din;
+	short int			num_full;
 };
 
 // Validators

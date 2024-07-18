@@ -34,7 +34,9 @@ void	*routine(void *arg)
     philo->table->num_phs_init++;
     pthread_mutex_unlock(&philo->table->ph_num_phs_init);
     while (!is_created(philo->table))
-		;
+    {
+        philo->lst_meal = philo->table->init_time;
+    }
 	while (!is_someone_dead(philo->table) && !is_fullfiled(philo))
 	{
 		eating(philo);

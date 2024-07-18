@@ -85,21 +85,21 @@ int	create_philos(t_table *table)
 
 	i = 0;
 
+	table->init_time = get_time();
 	if (table->num_phs == 1)
 	{
-		table->init_time = get_time();
 		pthread_create(table->philos[i].philo, NULL,
 			&single_routine, &(table->philos[i]));
 	}
 	else
 	{
+		pthread_create(&(table->mon), NULL, &monitoring, table);
 		while (i < table->num_phs)
 		{
 			pthread_create(table->philos[i].philo, NULL,
 				&routine, &(table->philos[i]));
 			i++;
 		}
-		pthread_create(&(table->mon), NULL, &monitoring, table);
 	}
 	// pthread_mutex_lock(&table->ph_lst_ml);
 	// table->init_time = get_time();
