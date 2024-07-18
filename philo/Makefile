@@ -1,9 +1,9 @@
 CC = gcc
-#-fsanitize=thread
-FLAGS = -Wall -Werror -Wextra -pthread -fsanitize=thread
+#-fsanitize=thread -- inserir
+FLAGS = -Wall -Werror -Wextra -pthread
 
 NAME = philo
-SRC = ${addsuffix .c, main utils utils2 init actions monitor}
+SRC = ${addsuffix .c, main utils utils2 init actions monitor routine}
 OBJS = ${SRC:%.c=bin/%.o}
 
 
@@ -12,6 +12,7 @@ all: initial_msg $(NAME)
 
 initial_msg:
 	@echo "$(NAME): Compilar ou não compilar? Eis a questão..."
+	@mkdir -p bin
 
 $(NAME): $(OBJS)
 	@$(CC) $(FLAGS) $(OBJS) -o $(NAME) && echo "Compilando: $@"
@@ -21,6 +22,7 @@ bin/%.o:%.c
 
 clean:
 	@rm -f $(OBJS) && echo "$(NAME): Objects removidos"
+	@rm -rf bin && echo "$(NAME): Diretório bin removido"
 
 fclean: clean
 	@rm -f $(NAME) && echo "$(NAME): Executável removido"

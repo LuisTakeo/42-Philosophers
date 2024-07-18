@@ -14,20 +14,20 @@
 
 int	take_forks(t_philo *philo)
 {
-	if (philo->id % 2)
+	if (philo->id % 2 == 0)
 	{
 		usleep(40);
 		pthread_mutex_lock(philo->l_fork);
-		print_action(philo, "%d %d has taken a fork\n", 1);
+		print_action(philo, "%d %d has taken a fork\n");
 		pthread_mutex_lock(philo->r_fork);
-		print_action(philo, "%d %d has taken a fork\n", 1);
+		print_action(philo, "%d %d has taken a fork\n");
 	}
 	else
 	{
 		pthread_mutex_lock(philo->r_fork);
-		print_action(philo, "%d %d has taken a fork\n", 1);
+		print_action(philo, "%d %d has taken a fork\n");
 		pthread_mutex_lock(philo->l_fork);
-		print_action(philo, "%d %d has taken a fork\n", 1);
+		print_action(philo, "%d %d has taken a fork\n");
 	}
 	return (0);
 }
@@ -36,7 +36,6 @@ int	release_forks(t_philo *philo)
 {
 	if (philo->id % 2 == 0)
 	{
-		usleep(40);
 		pthread_mutex_unlock(philo->l_fork);
 		pthread_mutex_unlock(philo->r_fork);
 	}
@@ -63,27 +62,24 @@ int	is_end_dinner(t_table *table)
 int	eating(t_philo *philo)
 {
 	take_forks(philo);
-	if (is_someone_dead(philo->table))
-		return (release_forks(philo));
-	print_action(philo, "%d %d is eating\n", 1);
-	pthread_mutex_lock(&philo->table->ph_lst_meal);
-	philo->last_meal = get_time();
-	pthread_mutex_unlock(&philo->table->ph_lst_meal);
-	philo->eat_times += 1;
+	// if (is_someone_dead(philo->table))
+	// 	return (release_forks(philo));
+
+	pthread_mutex_lock(&philo->table->ph_lst_ml);
+	philo->lst_meal = get_time();
+	pthread_mutex_unlock(&philo->table->ph_lst_ml);
+	print_action(philo, "%d %d is eating\n");
+	philo->eat_t += 1;
 	usleep(philo->table->t_to_eat * 1000);
 	release_forks(philo);
 	return (EXIT_SUCCESS);
 }
 
-int	sleeping(t_philo *philo)
+int	sleep_n_think(t_philo *philo)
 {
-	print_action(philo, "%d %d is sleeping\n", 1);
+	print_action(philo, "%d %d is sleeping\n");
 	usleep(philo->table->t_to_sleep * 1000);
-	return (EXIT_SUCCESS);
-}
+	print_action(philo, "%d %d is thinking\n");
 
-int	thinking(t_philo *philo)
-{
-	print_action(philo, "%d %d is thinking\n", 1);
 	return (EXIT_SUCCESS);
 }

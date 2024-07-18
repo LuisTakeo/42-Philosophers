@@ -21,6 +21,9 @@ int	init_table(t_table *table, int argc, char **argv)
 	table->max_eat = -1;
 	table->is_dead = 0;
 	table->end_din = 0;
+	table->is_created = 0;
+	table->num_full = 0;
+	table->num_phs_init = 0;
 	if (argc == 6)
 		table->max_eat = ft_atol(argv[5]);
 	if (table->max_eat == 0)
@@ -46,12 +49,12 @@ int	init_struct_philos(t_table *table)
 	{
 		table->philos[i].philo = &table->ph_th[i];
 		table->philos[i].id = i;
-		table->philos[i].eat_times = 0;
-		table->philos[i].last_meal = 0;
-		table->philos[i].l_fork = &table->ph_mutex[i];
+		table->philos[i].eat_t = 0;
+		table->philos[i].lst_meal = get_time();
+		table->philos[i].l_fork = &table->ph_mut[i];
 		table->philos[i].r_fork = NULL;
 		if (table->num_phs > 1)
-			table->philos[i].r_fork = &table->ph_mutex[(i + 1)
+			table->philos[i].r_fork = &table->ph_mut[(i + 1)
 				% table->num_phs];
 		table->philos[i].table = table;
 		i++;
@@ -64,15 +67,21 @@ int	init_mutexes(t_table *table)
 	int	i;
 
 	i = 0;
-	while (i < table->num_phs)
-	{
-		pthread_mutex_init(&table->ph_mutex[i], NULL);
-		i++;
-	}
+	table->ph_mut = malloc(sizeof(pthread_mutex_t) * table->num_phs);
+	if (!table->ph_mut)
+		return (1);
 	pthread_mutex_init(&table->ph_print, NULL);
-	pthread_mutex_init(&table->ph_is_dead, NULL);
-	pthread_mutex_init(&table->ph_lst_meal, NULL);
+	pthread_mutex_init(&table->ph_is_d, NULL);
+	pthread_mutex_init(&table->ph_lst_ml, NULL);
 	pthread_mutex_init(&table->ph_is_full, NULL);
 	pthread_mutex_init(&table->ph_end_din, NULL);
+	pthread_mutex_init(&table->ph_init, NULL);
+	pthread_mutex_init(&table->ph_num_phs, NULL);
+	pthread_mutex_init(&table->ph_num_phs_init, NULL);
+	while (i < table->num_phs)
+	{
+		pthread_mutex_init(&table->ph_mut[i], NULL);
+		i++;
+	}
 	return (0);
 }
