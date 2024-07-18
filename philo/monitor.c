@@ -28,14 +28,14 @@ int	verify_death(t_table *table)
 {
 	int		i;
 	int		is_dead;
-	long	last;
 
 	i = 0;
-	while (i < table->num_of_philos && !is_someone_dead(table))
+	while (i < table->num_phs)
 	{
+		if (is_someone_dead(table))
+			return (1);
 		pthread_mutex_lock(&table->ph_lst_meal);
-		last = table->philos[i].last_meal;
-		if ((get_time() - table->philos[i].last_meal) >= table->t_to_die)
+		if ((get_time() - table->philos[i].last_meal) > table->t_to_die)
 		{
 			pthread_mutex_lock(&table->ph_is_dead);
 			table->is_dead = 1;
@@ -57,6 +57,9 @@ void	*monitoring(void *arg)
 
 	table = (t_table *)arg;
 	while (!verify_death(table))
-		;
+		usleep(300);
+	pthread_mutex_lock(&table->ph_end_din);
+	table->end_din = 1;
+	pthread_mutex_unlock(&table->ph_end_din);
 	return (NULL);
 }

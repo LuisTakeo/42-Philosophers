@@ -28,12 +28,12 @@ typedef struct timeval	t_timeval;
 struct s_philo
 {
 	pthread_t		*philo;
-	int				id_philo;
+	short int		id;
 	int				eat_times;
 	long			last_meal;
 	t_table			*table;
-	pthread_mutex_t	*left_fork;
-	pthread_mutex_t	*right_fork;
+	pthread_mutex_t	*l_fork;
+	pthread_mutex_t	*r_fork;
 };
 
 struct s_table
@@ -44,14 +44,18 @@ struct s_table
 	pthread_mutex_t	ph_print;
 	pthread_mutex_t	ph_is_dead;
 	pthread_mutex_t	ph_lst_meal;
+	pthread_mutex_t	ph_is_full;
+	pthread_mutex_t	ph_end_din;
 	t_philo			*philos;
 	long			init_time;
 	long			t_to_die;
 	long			t_to_eat;
 	long			t_to_sleep;
 	int				max_eat;
-	int				num_of_philos;
-	int				is_dead;
+	short int		num_phs;
+	short int		is_dead;
+	short int		is_created;
+	short int		end_din;
 };
 
 // Validators
@@ -70,6 +74,7 @@ int		thinking(t_philo *philo);
 int		sleeping(t_philo *philo);
 int		take_forks(t_philo *philo);
 int		release_forks(t_philo *philo);
+int		is_fullfiled(t_philo *philo);
 // Utils
 int		ft_issignal(char c);
 int		ft_isspace(char c);
@@ -85,5 +90,6 @@ int		ft_print_error(char *error);
 void	*monitoring(void *arg);
 int		is_someone_dead(t_table *table);
 int		verify_death(t_table *table);
+int		is_end_dinner(t_table *table);
 
 #endif

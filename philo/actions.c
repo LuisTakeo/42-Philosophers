@@ -14,19 +14,19 @@
 
 int	take_forks(t_philo *philo)
 {
-	if (philo->id_philo % 2 && !is_someone_dead(philo->table))
+	if (philo->id % 2)
 	{
 		usleep(40);
-		pthread_mutex_lock(philo->left_fork);
+		pthread_mutex_lock(philo->l_fork);
 		print_action(philo, "%d %d has taken a fork\n", 1);
-		pthread_mutex_lock(philo->right_fork);
+		pthread_mutex_lock(philo->r_fork);
 		print_action(philo, "%d %d has taken a fork\n", 1);
 	}
-	else if (!is_someone_dead(philo->table))
+	else
 	{
-		pthread_mutex_lock(philo->right_fork);
+		pthread_mutex_lock(philo->r_fork);
 		print_action(philo, "%d %d has taken a fork\n", 1);
-		pthread_mutex_lock(philo->left_fork);
+		pthread_mutex_lock(philo->l_fork);
 		print_action(philo, "%d %d has taken a fork\n", 1);
 	}
 	return (0);
@@ -34,26 +34,42 @@ int	take_forks(t_philo *philo)
 
 int	release_forks(t_philo *philo)
 {
-	if (philo->id_philo % 2)
+	if (philo->id % 2 == 0)
 	{
-		pthread_mutex_unlock(philo->left_fork);
-		pthread_mutex_unlock(philo->right_fork);
+		usleep(40);
+		pthread_mutex_unlock(philo->l_fork);
+		pthread_mutex_unlock(philo->r_fork);
 	}
 	else
 	{
-		pthread_mutex_unlock(philo->right_fork);
-		pthread_mutex_unlock(philo->left_fork);
+		pthread_mutex_unlock(philo->r_fork);
+		pthread_mutex_unlock(philo->l_fork);
 	}
+	return (0);
+}
+
+int	is_end_dinner(t_table *table)
+{
+	pthread_mutex_lock(&table->ph_end_din);
+	if (table->end_din)
+	{
+		pthread_mutex_unlock(&table->ph_end_din);
+		return (1);
+	}
+	pthread_mutex_unlock(&table->ph_end_din);
 	return (0);
 }
 
 int	eating(t_philo *philo)
 {
 	take_forks(philo);
+	if (is_someone_dead(philo->table))
+		return (release_forks(philo));
+	print_action(philo, "%d %d is eating\n", 1);
 	pthread_mutex_lock(&philo->table->ph_lst_meal);
 	philo->last_meal = get_time();
 	pthread_mutex_unlock(&philo->table->ph_lst_meal);
-	print_action(philo, "%d %d is eating\n", 1);
+	philo->eat_times += 1;
 	usleep(philo->table->t_to_eat * 1000);
 	release_forks(philo);
 	return (EXIT_SUCCESS);

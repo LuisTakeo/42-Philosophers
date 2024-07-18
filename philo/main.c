@@ -18,8 +18,20 @@ int	print_action(t_philo *philo, char *msg, int is_philo)
 		return (1);
 	pthread_mutex_lock(&philo->table->ph_print);
 	printf(msg, (int)(get_time() - philo->table->init_time),
-		philo->id_philo + 1);
+		philo->id + 1);
 	pthread_mutex_unlock(&philo->table->ph_print);
+	return (0);
+}
+
+int	is_fullfiled(t_philo *philo)
+{
+	pthread_mutex_lock(&philo->table->ph_is_full);
+	if (philo->eat_times >= philo->table->max_eat)
+	{
+		pthread_mutex_unlock(&philo->table->ph_is_full);
+		return (1);
+	}
+	pthread_mutex_unlock(&philo->table->ph_is_full);
 	return (0);
 }
 
@@ -28,10 +40,10 @@ void	*single_routine(void *arg)
 	t_philo	philo;
 
 	philo = *(t_philo *)arg;
-	pthread_mutex_lock(philo.left_fork);
+	pthread_mutex_lock(philo.l_fork);
 	print_action(&philo, "%d %d has taken a fork\n", 1);
 	usleep(philo.table->t_to_die * 1000);
-	pthread_mutex_unlock(philo.left_fork);
+	pthread_mutex_unlock(philo.l_fork);
 	print_action(&philo, "%d %d is dead\n", 1);
 	return (NULL);
 }
@@ -39,17 +51,19 @@ void	*single_routine(void *arg)
 void	*routine(void *arg)
 {
 	t_philo	*philo;
-	int		i;
 
 	philo = (t_philo *)arg;
-	i = 0;
+	pthread_mutex_lock(&philo->table->ph_lst_meal);
+	philo->last_meal = get_time();
+	pthread_mutex_unlock(&philo->table->ph_lst_meal);
 	while (!is_someone_dead(philo->table))
 	{
 		eating(philo);
 		sleeping(philo);
 		thinking(philo);
-		i++;
 	}
+	while (!is_end_dinner(philo->table))
+		usleep(50);
 	return (NULL);
 }
 
@@ -79,7 +93,7 @@ int	finish_dinner(t_table *table)
 	int	i;
 
 	i = 0;
-	while (i < table->num_of_philos)
+	while (i < table->num_phs)
 	{
 		pthread_mutex_destroy(&table->ph_mutex[i++]);
 		if (table->philos)
@@ -91,6 +105,7 @@ int	finish_dinner(t_table *table)
 	pthread_mutex_destroy(&table->ph_print);
 	pthread_mutex_destroy(&table->ph_is_dead);
 	pthread_mutex_destroy(&table->ph_lst_meal);
+	pthread_mutex_destroy(&table->ph_is_full);
 	return (0);
 }
 
@@ -99,13 +114,13 @@ int	join_philos(t_table *table)
 	int	i;
 
 	i = 0;
-	while (i < table->num_of_philos)
+	if (table->num_phs > 1)
+		pthread_join(table->monitor, NULL);
+	while (i < table->num_phs)
 	{
 		pthread_join(*(table->philos[i].philo), NULL);
 		i++;
 	}
-	if (table->num_of_philos > 1)
-		pthread_join(table->monitor, NULL);
 	return (0);
 }
 
@@ -114,12 +129,13 @@ int	create_philos(t_table *table)
 	int	i;
 
 	i = 0;
-	if (table->num_of_philos == 1)
+	table->init_time = get_time();
+	if (table->num_phs == 1)
 		pthread_create(table->philos[i].philo, NULL,
 			&single_routine, &(table->philos[i]));
 	else
 	{
-		while (i < table->num_of_philos)
+		while (i < table->num_phs)
 		{
 			pthread_create(table->philos[i].philo, NULL,
 				&routine, &(table->philos[i]));
