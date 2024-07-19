@@ -24,47 +24,49 @@ int	print_dead(t_table *table)
 
 }
 
-int	is_someone_dead(t_table *table, int is_philo)
+int	verify_fullfiled(t_table *table)
 {
-	if (is_philo)
-		usleep(0);
-	pthread_mutex_lock(&table->ph_is_d);
-	if (table->is_dead)
+	int	i;
+
+	i = 0;
+	if (table->max_eat == -1)
+		return (0);
+	pthread_mutex_lock(&table->ph_num_phs);
+	if (table->num_full == table->num_phs)
 	{
-		pthread_mutex_unlock(&table->ph_is_d);
+		pthread_mutex_unlock(&table->ph_num_phs);
+		table->is_full = 1;
 		return (1);
 	}
-	pthread_mutex_unlock(&table->ph_is_d);
+	pthread_mutex_unlock(&table->ph_num_phs);
+	i++;
 	return (0);
 }
 
 int	verify_death(t_table *table)
 {
 	int		i;
-	int		is_dead;
+	size_t	time;
 
 	i = 0;
-	while (i < table->num_phs)
+	while (i < table->num_phs && !is_someone_dead(table, 0))
 	{
-		pthread_mutex_lock(&table->ph_num_phs);
-		if (table->num_full == table->num_phs)
+		pthread_mutex_lock(&table->philos[i].ph_meal);
+		time = (size_t)(get_time() - table->philos[i].lst_meal);
+		pthread_mutex_unlock(&table->philos[i].ph_meal);
+		if (!is_fullfiled(&table->philos[i]) && time > table->t_to_die)
 		{
-			pthread_mutex_unlock(&table->ph_num_phs);
-			return (1);
-		}
-		pthread_mutex_unlock(&table->ph_num_phs);
-		if (is_someone_dead(table, 0))
-		{
+			pthread_mutex_lock(&table->philos[i].ph_dead);
+			table->is_dead = table->philos[i].id + 1;
+			pthread_mutex_unlock(&table->philos[i].ph_dead);
 			print_dead(table);
 			return (1);
 		}
+		if (verify_fullfiled(table))
+			return (1);
 		i++;
-		;
 	}
-	pthread_mutex_lock(&table->ph_is_d);
-	is_dead = table->is_dead;
-	pthread_mutex_unlock(&table->ph_is_d);
-	return (is_dead);
+	return (0);
 }
 
 void	*monitoring(void *arg)
@@ -85,8 +87,11 @@ void	*monitoring(void *arg)
 	pthread_mutex_lock(&table->ph_init);
 	table->is_created = 1;
 	pthread_mutex_unlock(&table->ph_init);
-	while (!verify_death(table))
-		usleep(1000);
+	while (1)
+	{
+		if (verify_fullfiled(table) || verify_death(table))
+			break ;
+	}
 	pthread_mutex_lock(&table->ph_end_din);
 	table->end_din = 1;
 	pthread_mutex_unlock(&table->ph_end_din);

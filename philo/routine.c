@@ -35,7 +35,9 @@ void	*routine(void *arg)
     pthread_mutex_unlock(&philo->table->ph_num_phs_init);
     while (!is_created(philo->table))
     {
+		pthread_mutex_lock(&philo->ph_meal);
         philo->lst_meal = philo->table->init_time;
+		pthread_mutex_unlock(&philo->ph_meal);
     }
 	// if (philo->id % 2 == 0)
 	// 	usleep(100);

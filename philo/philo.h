@@ -32,6 +32,8 @@ struct s_philo
 	short int		eat_t;
 	long			lst_meal;
 	t_table			*table;
+	pthread_mutex_t	ph_meal;
+	pthread_mutex_t	ph_dead;
 	pthread_mutex_t	*l_fork;
 	pthread_mutex_t	*r_fork;
 };
@@ -61,6 +63,7 @@ struct s_table
 	short int			is_created;
 	short int			end_din;
 	short int			num_full;
+	short int			is_full;
 };
 
 // Validators
@@ -82,6 +85,7 @@ int		release_forks(t_philo *philo);
 int		is_fullfiled(t_philo *philo);
 // Finishers
 int		finish_dinner(t_table *table);
+int		destroy_mutexes(t_table *table);
 // Utils
 int		ft_issignal(char c);
 int		ft_isspace(char c);
@@ -98,6 +102,7 @@ int		ft_print_error(char *error);
 void	*monitoring(void *arg);
 int		is_someone_dead(t_table *table, int is_philo);
 int		verify_death(t_table *table);
+int		verify_fullfiled(t_table *table);
 int		is_end_dinner(t_table *table);
 
 #endif

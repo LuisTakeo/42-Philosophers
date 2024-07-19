@@ -3,7 +3,7 @@ CC = gcc
 FLAGS = -Wall -Werror -Wextra -pthread -fsanitize=thread
 
 NAME = philo
-SRC = ${addsuffix .c, main utils utils2 init actions monitor routine}
+SRC = ${addsuffix .c, main utils utils2 init actions monitor routine get_set}
 OBJS = ${SRC:%.c=bin/%.o}
 
 

@@ -33,15 +33,31 @@ int	is_invalid_param(char **argv)
 	return (EXIT_SUCCESS);
 }
 
-int	finish_dinner(t_table *table)
+int	destroy_mutexes(t_table *table)
 {
 	int	i;
 
 	i = 0;
 	while (i < table->num_phs)
 	{
+		pthread_mutex_destroy(&table->philos[i].ph_meal);
+		pthread_mutex_destroy(&table->philos[i].ph_dead);
 		pthread_mutex_destroy(&table->ph_mut[i++]);
 	}
+	pthread_mutex_destroy(&table->ph_print);
+	pthread_mutex_destroy(&table->ph_is_d);
+	pthread_mutex_destroy(&table->ph_lst_ml);
+	pthread_mutex_destroy(&table->ph_is_full);
+	pthread_mutex_destroy(&table->ph_end_din);
+	pthread_mutex_destroy(&table->ph_init);
+	pthread_mutex_destroy(&table->ph_num_phs);
+	pthread_mutex_destroy(&table->ph_num_phs_init);
+	return (0);
+}
+
+int	finish_dinner(t_table *table)
+{
+	destroy_mutexes(table);
 	if (table->ph_mut)
 	{
 		free(table->ph_mut);
@@ -52,14 +68,6 @@ int	finish_dinner(t_table *table)
 		free(table->philos);
 		table->philos = NULL;
 	}
-	pthread_mutex_destroy(&table->ph_print);
-	pthread_mutex_destroy(&table->ph_is_d);
-	pthread_mutex_destroy(&table->ph_lst_ml);
-	pthread_mutex_destroy(&table->ph_is_full);
-	pthread_mutex_destroy(&table->ph_end_din);
-	pthread_mutex_destroy(&table->ph_init);
-	pthread_mutex_destroy(&table->ph_num_phs);
-	pthread_mutex_destroy(&table->ph_num_phs_init);
 	return (0);
 }
 
@@ -86,19 +94,17 @@ int	create_philos(t_table *table)
 	int	i;
 
 	i = 0;
-
 	table->init_time = get_time();
 	if (table->num_phs == 1)
 	{
-		if (pthread_create(table->philos[i].philo, NULL,
-			&single_routine, &(table->philos[i])) != 0)
+		if (pthread_create(table->philos[0].philo, NULL,
+			&single_routine, &(table->philos[0])) != 0)
 			return (ft_print_error("Error creating thread"));
 	}
 	else
 	{
 		if (pthread_create(&(table->mon), NULL, &monitoring, table) != 0)
 			return (ft_print_error("Error creating thread"));
-		// usleep(130);
 		while (i < table->num_phs)
 		{
 			if (pthread_create(table->philos[i].philo, NULL,
@@ -107,12 +113,6 @@ int	create_philos(t_table *table)
 			i++;
 		}
 	}
-	// pthread_mutex_lock(&table->ph_lst_ml);
-	// table->init_time = get_time();
-	// pthread_mutex_unlock(&table->ph_lst_ml);
-	// pthread_mutex_lock(&table->ph_init);
-	// table->is_created = 1;
-	// pthread_mutex_unlock(&table->ph_init);
 	if (join_philos(table))
 		return (EXIT_FAILURE);
 	return (0);

@@ -24,6 +24,7 @@ int	init_table(t_table *table, int argc, char **argv)
 	table->is_created = 0;
 	table->num_full = 0;
 	table->num_phs_init = 0;
+	table->is_full = 0;
 	if (argc == 6)
 		table->max_eat = ft_atol(argv[5]);
 	if (table->max_eat == 0)
@@ -81,6 +82,8 @@ int	init_mutexes(t_table *table)
 	pthread_mutex_init(&table->ph_num_phs_init, NULL);
 	while (i < table->num_phs)
 	{
+		pthread_mutex_init(&table->philos[i].ph_dead, NULL);
+		pthread_mutex_init(&table->philos[i].ph_meal, NULL);
 		pthread_mutex_init(&table->ph_mut[i], NULL);
 		i++;
 	}
