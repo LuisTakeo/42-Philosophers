@@ -90,6 +90,7 @@ int		ft_isdigit(int c);
 int		is_int(char *arg);
 long	ft_atol(const char *nptr);
 long	get_time(void);
+int		update_dead(t_philo *philo);
 // Prints
 void	print_action(t_philo *philo, char *msg);
 int		ft_print_error(char *error);

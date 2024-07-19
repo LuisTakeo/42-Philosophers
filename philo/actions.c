@@ -72,8 +72,9 @@ int	eating(t_philo *philo)
 	size_t	time;
 
 	take_forks(philo);
-	if (is_someone_dead(philo->table, 1))
+	if (is_someone_dead(philo->table, 1) || is_fullfiled(philo))
 		return (release_forks(philo));
+
 	time = get_time();
 	if ((size_t)(time - philo->lst_meal) > philo->table->t_to_die)
 	{
@@ -92,6 +93,8 @@ int	sleep_n_think(t_philo *philo)
 {
 	print_action(philo, "%d %d is sleeping\n");
 	usleep(philo->table->t_to_sleep * 1000);
+	if (is_someone_dead(philo->table, 1) || is_fullfiled(philo))
+		return (EXIT_SUCCESS);
 	print_action(philo, "%d %d is thinking\n");
 	usleep(0);
 	return (EXIT_SUCCESS);

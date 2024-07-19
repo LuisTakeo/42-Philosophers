@@ -41,10 +41,10 @@ void	*routine(void *arg)
 	// 	usleep(100);
 	while (!is_someone_dead(philo->table, 1) && !is_fullfiled(philo))
 	{
-		if (!is_someone_dead(philo->table, 1))
-			eating(philo);
-		if (!is_someone_dead(philo->table, 1))
-			sleep_n_think(philo);
+		eating(philo);
+		if (is_someone_dead(philo->table, 1) || is_fullfiled(philo))
+			break ;
+		sleep_n_think(philo);
 	}
 	while (!is_end_dinner(philo->table))
 		;
@@ -65,7 +65,7 @@ int		is_created(t_table *table)
 
 void	print_action(t_philo *philo, char *msg)
 {
-	if (is_someone_dead(philo->table, 1))
+	if (is_someone_dead(philo->table, 1) || is_fullfiled(philo))
 		return ;
 	pthread_mutex_lock(&philo->table->ph_print);
 	printf(msg, (size_t)((get_time()) - philo->table->init_time),
