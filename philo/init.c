@@ -33,6 +33,7 @@ int	init_table(t_table *table, int argc, char **argv)
 				"philosophers. Min value: 1, Max value: 200"));
 	if (init_struct_philos(table))
 		return (1);
+
 	return (0);
 }
 
