@@ -68,13 +68,15 @@ int	join_philos(t_table *table)
 	int	i;
 
 	i = 0;
+	if (table->num_phs > 1)
+		 if (pthread_join(table->mon, NULL) != 0)
+			return (ft_print_error("Error joining thread"));
 	while (i < table->num_phs)
 	{
-		pthread_join(*(table->philos[i].philo), NULL);
+		if (pthread_join(*(table->philos[i].philo), NULL) != 0)
+			return (ft_print_error("Error joining thread"));
 		i++;
 	}
-	if (table->num_phs > 1)
-		pthread_join(table->mon, NULL);
 
 	return (0);
 }
@@ -88,17 +90,20 @@ int	create_philos(t_table *table)
 	table->init_time = get_time();
 	if (table->num_phs == 1)
 	{
-		pthread_create(table->philos[i].philo, NULL,
-			&single_routine, &(table->philos[i]));
+		if (pthread_create(table->philos[i].philo, NULL,
+			&single_routine, &(table->philos[i])) != 0)
+			return (ft_print_error("Error creating thread"));
 	}
 	else
 	{
-		pthread_create(&(table->mon), NULL, &monitoring, table);
+		if (pthread_create(&(table->mon), NULL, &monitoring, table) != 0)
+			return (ft_print_error("Error creating thread"));
 		// usleep(130);
 		while (i < table->num_phs)
 		{
-			pthread_create(table->philos[i].philo, NULL,
-				&routine, &(table->philos[i]));
+			if (pthread_create(table->philos[i].philo, NULL,
+				&routine, &(table->philos[i])) != 0)
+				return (ft_print_error("Error creating thread"));
 			i++;
 		}
 	}
@@ -108,7 +113,8 @@ int	create_philos(t_table *table)
 	// pthread_mutex_lock(&table->ph_init);
 	// table->is_created = 1;
 	// pthread_mutex_unlock(&table->ph_init);
-	join_philos(table);
+	if (join_philos(table))
+		return (EXIT_FAILURE);
 	return (0);
 }
 
@@ -125,7 +131,8 @@ int	main(int argc, char **argv)
 		return (EXIT_FAILURE);
 	if (table.max_eat == 0)
 		return (EXIT_SUCCESS);
-	create_philos(&table);
+	if (create_philos(&table))
+		return (EXIT_FAILURE);
 	finish_dinner(&table);
 	// printf("Finish time: %ld\n", get_time() - table.init_time);
 	return (EXIT_SUCCESS);
