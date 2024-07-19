@@ -15,8 +15,6 @@
 int	print_dead(t_table *table)
 {
 	pthread_mutex_lock(&table->ph_is_d);
-
-
 	pthread_mutex_lock(&table->ph_print);
 	printf("%ld %d is dead\n", (size_t)((get_time()) - table->init_time),
 		table->is_dead);
@@ -26,8 +24,10 @@ int	print_dead(t_table *table)
 
 }
 
-int	is_someone_dead(t_table *table)
+int	is_someone_dead(t_table *table, int is_philo)
 {
+	if (is_philo)
+		usleep(0);
 	pthread_mutex_lock(&table->ph_is_d);
 	if (table->is_dead)
 	{
@@ -46,8 +46,6 @@ int	verify_death(t_table *table)
 	i = 0;
 	while (i < table->num_phs)
 	{
-		if (is_someone_dead(table))
-			return (1);
 		pthread_mutex_lock(&table->ph_num_phs);
 		if (table->num_full == table->num_phs)
 		{
@@ -55,9 +53,13 @@ int	verify_death(t_table *table)
 			return (1);
 		}
 		pthread_mutex_unlock(&table->ph_num_phs);
-		if (table->is_dead)
+		if (is_someone_dead(table, 0))
+		{
 			print_dead(table);
+			return (1);
+		}
 		i++;
+		;
 	}
 	pthread_mutex_lock(&table->ph_is_d);
 	is_dead = table->is_dead;
@@ -84,7 +86,7 @@ void	*monitoring(void *arg)
 	table->is_created = 1;
 	pthread_mutex_unlock(&table->ph_init);
 	while (!verify_death(table))
-		;
+		usleep(1000);
 	pthread_mutex_lock(&table->ph_end_din);
 	table->end_din = 1;
 	pthread_mutex_unlock(&table->ph_end_din);

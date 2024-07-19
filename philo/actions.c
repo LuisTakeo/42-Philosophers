@@ -16,6 +16,7 @@ int	take_forks(t_philo *philo)
 {
 	if (philo->id % 2 == 0)
 	{
+		// usleep(40);
 		pthread_mutex_lock(philo->l_fork);
 		print_action(philo, "%d %d has taken a fork\n");
 		pthread_mutex_lock(philo->r_fork);
@@ -68,17 +69,18 @@ int	update_dead(t_philo *philo)
 
 int	eating(t_philo *philo)
 {
-	take_forks(philo);
-	// if (is_someone_dead(philo->table))
-	// 	return (release_forks(philo));
+	size_t	time;
 
-	// pthread_mutex_lock(&philo->table->ph_lst_ml);
-	if ((size_t)(get_time() - philo->lst_meal) > philo->table->t_to_die)
+	take_forks(philo);
+	if (is_someone_dead(philo->table, 1))
+		return (release_forks(philo));
+	time = get_time();
+	if ((size_t)(time - philo->lst_meal) > philo->table->t_to_die)
 	{
 		update_dead(philo);
 	}
-	philo->lst_meal = get_time();
 	// pthread_mutex_unlock(&philo->table->ph_lst_ml);
+	philo->lst_meal = time;
 	print_action(philo, "%d %d is eating\n");
 	philo->eat_t += 1;
 	release_forks(philo);
@@ -91,6 +93,6 @@ int	sleep_n_think(t_philo *philo)
 	print_action(philo, "%d %d is sleeping\n");
 	usleep(philo->table->t_to_sleep * 1000);
 	print_action(philo, "%d %d is thinking\n");
-
+	usleep(0);
 	return (EXIT_SUCCESS);
 }

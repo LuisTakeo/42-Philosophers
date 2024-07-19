@@ -91,11 +91,11 @@ int		is_int(char *arg);
 long	ft_atol(const char *nptr);
 long	get_time(void);
 // Prints
-void	print_action(t_philo *philo, char *msg );
+void	print_action(t_philo *philo, char *msg);
 int		ft_print_error(char *error);
 // monitoring
 void	*monitoring(void *arg);
-int		is_someone_dead(t_table *table);
+int		is_someone_dead(t_table *table, int is_philo);
 int		verify_death(t_table *table);
 int		is_end_dinner(t_table *table);
 

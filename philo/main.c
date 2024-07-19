@@ -94,6 +94,7 @@ int	create_philos(t_table *table)
 	else
 	{
 		pthread_create(&(table->mon), NULL, &monitoring, table);
+		usleep(130);
 		while (i < table->num_phs)
 		{
 			pthread_create(table->philos[i].philo, NULL,
