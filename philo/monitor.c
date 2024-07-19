@@ -21,7 +21,6 @@ int	print_dead(t_table *table)
 	pthread_mutex_unlock(&table->ph_print);
 	pthread_mutex_unlock(&table->ph_is_d);
 	return (1);
-
 }
 
 int	verify_fullfiled(t_table *table)

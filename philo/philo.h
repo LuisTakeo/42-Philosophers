@@ -72,6 +72,7 @@ int		is_invalid_param(char **argv);
 int		init_table(t_table *table, int argc, char **argv);
 int		init_struct_philos(t_table *table);
 int		init_mutexes(t_table *table);
+int		create_philos(t_table *table);
 int		join_philos(t_table *table);
 int		is_created(t_table *table);
 // Routines

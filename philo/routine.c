@@ -6,7 +6,7 @@
 /*   By: tpaim-yu <tpaim-yu@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/27 16:03:14 by tpaim-yu          #+#    #+#             */
-/*   Updated: 2024/06/27 16:03:14 by tpaim-yu         ###   ########.fr       */
+/*   Updated: 2024/07/19 15:12:58 by tpaim-yu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,17 +30,15 @@ void	*routine(void *arg)
 	t_philo	*philo;
 
 	philo = (t_philo *)arg;
-    pthread_mutex_lock(&philo->table->ph_num_phs_init);
-    philo->table->num_phs_init++;
-    pthread_mutex_unlock(&philo->table->ph_num_phs_init);
-    while (!is_created(philo->table))
-    {
+	pthread_mutex_lock(&philo->table->ph_num_phs_init);
+	philo->table->num_phs_init++;
+	pthread_mutex_unlock(&philo->table->ph_num_phs_init);
+	while (!is_created(philo->table))
+	{
 		pthread_mutex_lock(&philo->ph_meal);
-        philo->lst_meal = philo->table->init_time;
+		philo->lst_meal = philo->table->init_time;
 		pthread_mutex_unlock(&philo->ph_meal);
-    }
-	// if (philo->id % 2 == 0)
-	// 	usleep(100);
+	}
 	while (!is_someone_dead(philo->table, 1) && !is_fullfiled(philo))
 	{
 		eating(philo);
@@ -53,7 +51,7 @@ void	*routine(void *arg)
 	return (NULL);
 }
 
-int		is_created(t_table *table)
+int	is_created(t_table *table)
 {
 	pthread_mutex_lock(&table->ph_init);
 	if (table->is_created)
@@ -71,7 +69,7 @@ void	print_action(t_philo *philo, char *msg)
 		return ;
 	pthread_mutex_lock(&philo->table->ph_print);
 	printf(msg, (size_t)((get_time()) - philo->table->init_time),
-	philo->id + 1);
+		philo->id + 1);
 	pthread_mutex_unlock(&philo->table->ph_print);
 }
 
